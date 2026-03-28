@@ -107,21 +107,13 @@ class GetUserProfileAction implements ActionInterface {
 $app = new \Oryx\Mvc\Application();
 $container = $app->getContainer();
 
-// Register dependencies
-$container->set(UserDomain::class, new UserDomain());
-$container->set(\Oryx\Adr\Responder\ResponderFactory::class, 
-    new \Oryx\Adr\Responder\DefaultResponderFactory($container));
+// Register your domain and responder factory with the container
+// Example:
+// $container->set(UserDomain::class, new UserDomain());
+// $container->set(\Oryx\Adr\Responder\ResponderFactory::class, 
+//     new \Oryx\Adr\Responder\DefaultResponderFactory($container));
 
-// Create action with dependencies injected
-$action = new GetUserProfileAction(
-    $container->get(UserDomain::class),
-    $container->get(\Oryx\Adr\Responder\ResponderFactory::class)
-);
-
-// Process request
-$request = new ServerRequest(['REQUEST_METHOD' => 'GET', 'REQUEST_URI' => '/users/123']);
-$response = new Response();
-$result = $action($request, $response);
+// Then create your action and process the request.
 ```
 
 ### Using Built-in Responders

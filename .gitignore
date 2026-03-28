@@ -127,3 +127,6 @@ DerivedData
 .Network Trash Folder
 .Temporary Items
 .apdisk
+
+# Ensure test PHP files are not ignored
+!tests/**/*.php
