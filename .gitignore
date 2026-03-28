@@ -17,8 +17,9 @@ Thumbs.db
 # Logs
 *.log
 
-# PHP artifacts
+# PHP artifacts (but not in src/)
 *.php
+!src/**/*.php
 *.phpunit.result
 
 # Cache and temporary files
