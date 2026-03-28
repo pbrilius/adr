@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Oryx\Adr\Tests\Responder;
+
 use PHPUnit\Framework\TestCase;
 use Oryx\Adr\Responder\JsonApiResponder;
 use Psr\Http\Message\ResponseInterface;

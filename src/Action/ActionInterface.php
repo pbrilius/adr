@@ -19,7 +19,7 @@ interface ActionInterface
      * Execute the action with the given domain and return the responder class name.
      *
      * @param DomainInterface $domain The domain object containing business logic
-     * @return string The responder class name
+     * @return string           The responder class name
      */
     public function execute(DomainInterface $domain): string;
 
@@ -31,5 +31,9 @@ interface ActionInterface
      * @param callable $next The next middleware (optional)
      * @return ResponseInterface The response
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next = null): ResponseInterface;
+    public function __invoke(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        callable $next = null
+    ): ResponseInterface;
 }

@@ -10,7 +10,7 @@ use Laminas\Diactoros\Stream;
 
 /**
  * Responder that outputs JSON:API format.
- * 
+ *
  * This responder expects data to be already formatted according to JSON:API specification.
  * For convenience, static factory methods are provided to create common JSON:API structures.
  */
@@ -41,7 +41,7 @@ class JsonApiResponder implements ResponderInterface
         $responseHeaders = [
             'Content-Type' => 'application/vnd.api+json; charset=utf-8',
         ];
-        
+
         // Merge custom headers
         foreach ($this->headers as $name => $value) {
             $responseHeaders[$name] = $value;
@@ -113,9 +113,9 @@ class JsonApiResponder implements ResponderInterface
                 'links' => $resource['links'] ?? null,
             ];
             // Remove null values
-            foreach ($data[sizeof($data)-1] as $key => $value) {
+            foreach ($data[sizeof($data) - 1] as $key => $value) {
                 if ($value === null) {
-                    unset($data[sizeof($data)-1][$key]);
+                    unset($data[sizeof($data) - 1][$key]);
                 }
             }
         }

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Oryx\Adr\Tests\Responder;
+
 use PHPUnit\Framework\TestCase;
 use Oryx\Adr\Responder\ProblemDetailsResponder;
 use Psr\Http\Message\ResponseInterface;
@@ -44,7 +46,7 @@ class ProblemDetailsResponderTest extends TestCase
         );
         $response = $responder->respond();
         $body = json_decode($response->getBody()->getContents(), true);
-        
+
         $this->assertEquals('https://example.com/probs/unknown', $body['type']);
         $this->assertEquals('Unknown error', $body['title']);
         $this->assertEquals(500, $body['status']);

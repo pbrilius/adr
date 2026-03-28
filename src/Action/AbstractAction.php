@@ -60,10 +60,10 @@ abstract class AbstractAction implements ActionInterface
     {
         // Execute the action to get the responder class name
         $responderClass = $this->execute($this->domain);
-        
+
         // Create the responder instance using the factory
         $responderInstance = $this->responderFactory->create($responderClass);
-        
+
         // Generate and return the response
         return $responderInstance->respond();
     }

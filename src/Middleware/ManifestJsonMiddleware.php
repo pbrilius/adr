@@ -27,7 +27,7 @@ class ManifestJsonMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $uri = $request->getUri()->getPath();
-        
+
         // Handle manifest.json requests
         if ($uri === '/manifest.json' || $uri === '/manifest.webmanifest') {
             $manifest = [
@@ -81,12 +81,12 @@ class ManifestJsonMiddleware implements MiddlewareInterface
                     ]
                 ]
             ];
-            
+
             return new JsonResponse($manifest, 200, [
                 'Content-Type' => 'application/manifest+json'
             ]);
         }
-        
+
         // For all other requests, delegate to the next middleware
         return $handler->handle($request);
     }
