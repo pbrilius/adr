@@ -14,6 +14,7 @@ The library includes:
 - ManifestJsonMiddleware for PWA compatibility
 - PSR-15 compliant middleware integration
 - PSR-4 autoloading
+- JSON:API and Problem Details (RFC 7807) responders
 
 ## Installation
 
@@ -35,9 +36,12 @@ composer require oryx/adr
 ```php
 use Oryx\Adr\Action\ActionInterface;
 use Oryx\Adr\Domain\DomainInterface;
-use Oryx\Adr\Responder\ResponderInterface;
+use Oryx\Adr\Responder\ResponderFactory;
 use Psr\Http\Message\ResponseInterface;
-use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+use Laminas\Diactoros\ServerRequest;
+use Laminas\Diactoros\Response;
 
 // Define your domain
 class UserDomain implements DomainInterface {
@@ -52,7 +56,7 @@ class UserDomain implements DomainInterface {
 }
 
 // Define your responder
-class JsonResponder implements ResponderInterface {
+class JsonApiResponder implements ResponderInterface {
     private $data;
     
     public function __construct(array $data) {
@@ -60,23 +64,84 @@ class JsonResponder implements ResponderInterface {
     }
     
     public function respond(): ResponseInterface {
-        return new JsonResponse($this->data);
+        // Simplified JSON:API responder for example
+        return new \Laminas\Diactoros\JsonResponse($this->data);
     }
 }
 
 // Define your action
 class GetUserProfileAction implements ActionInterface {
-    public function execute(DomainInterface $domain): ResponderInterface {
+    private UserDomain $domain;
+    private ResponderFactory $responderFactory;
+    
+    public function __construct(UserDomain $domain, ResponderFactory $responderFactory) {
+        $this->domain = $domain;
+        $this->responderFactory = $responderFactory;
+    }
+    
+    public function execute(DomainInterface $domain): string {
         // Extract user ID from request (in real implementation)
         $userId = 123; 
         
         // Delegate to domain
         $userData = $domain->getUserProfile($userId);
         
-        // Return responder
-        return new JsonResponder($userData);
+        // Return responder class name
+        return JsonApiResponder::class;
+    }
+    
+    public function __invoke(ServerRequestInterface $request, PsrResponseInterface $response, callable $next = null): PsrResponseInterface
+    {
+        // Execute the action to get the responder class name
+        $responderClass = $this->execute($this->domain);
+        
+        // Create the responder instance using the factory
+        $responderInstance = $this->responderFactory->create($responderClass);
+        
+        // Generate and return the response
+        return $responderInstance->respond();
     }
 }
+
+// Usage in oryx/mvc
+$app = new \Oryx\Mvc\Application();
+$container = $app->getContainer();
+
+// Register your domain and responder factory with the container
+// Example:
+// $container->set(UserDomain::class, new UserDomain());
+// $container->set(\Oryx\Adr\Responder\ResponderFactory::class, 
+//     new \Oryx\Adr\Responder\DefaultResponderFactory($container));
+
+// Then create your action and process the request.
+```
+
+### Using Built-in Responders
+
+```php
+use Oryx\Adr\Responder\JsonApiResponder;
+use Oryx\Adr\Responder\ProblemDetailsResponder;
+
+// JSON:API responder for successful responses
+$jsonApiResponder = new JsonApiResponder([
+    'data' => [
+        'type' => 'users',
+        'id' => '1',
+        'attributes' => [
+            'name' => 'John Doe',
+            'email' => 'john@example.com'
+        ]
+    ]
+]);
+
+// Problem Details responder for error responses
+$problemDetailsResponder = new ProblemDetailsResponder(
+    'https://example.com/probs/out-of-credit',
+    'You do not have enough credit.',
+    403,
+    'Your account has only 5 USD left.',
+    'https://example.com/account/12345/msgs/abc'
+);
 ```
 
 ### Using with oryx/mvc Middleware
