@@ -66,15 +66,15 @@ class JsonResponder implements ResponderInterface {
 
 // Define your action
 class GetUserProfileAction implements ActionInterface {
-    public function execute(DomainInterface $domain): ResponderInterface {
+    public function execute(DomainInterface $domain): string {
         // Extract user ID from request (in real implementation)
         $userId = 123; 
         
         // Delegate to domain
         $userData = $domain->getUserProfile($userId);
         
-        // Return responder
-        return new JsonResponder($userData);
+        // Return responder class name
+        return JsonResponder::class;
     }
 }
 ```
