@@ -18,6 +18,78 @@ use Laminas\Diactoros\Response\JsonResponse;
 class ManifestJsonMiddleware implements MiddlewareInterface
 {
     /**
+     * @var string
+     */
+    private string $name;
+
+    /**
+     * @var string
+     */
+    private string $shortName;
+
+    /**
+     * @var string
+     */
+    private string $description;
+
+    /**
+     * @var string
+     */
+    private string $startUrl;
+
+    /**
+     * @var string
+     */
+    private string $display;
+
+    /**
+     * @var string
+     */
+    private string $backgroundColor;
+
+    /**
+     * @var string
+     */
+    private string $themeColor;
+
+    /**
+     * @var array
+     */
+    private array $icons;
+
+    /**
+     * Constructor.
+     *
+     * @param string $name          The application name
+     * @param string $shortName     The short application name
+     * @param string $description   The application description
+     * @param string $startUrl      The start URL
+     * @param string $display       The display mode
+     * @param string $backgroundColor The background color
+     * @param string $themeColor    The theme color
+     * @param array  $icons         The icons array
+     */
+    public function __construct(
+        string $name = 'Oryx PWA App',
+        string $shortName = 'OryxApp',
+        string $description = 'A PWA built with Oryx ADR',
+        string $startUrl = '/',
+        string $display = 'standalone',
+        string $backgroundColor = '#ffffff',
+        string $themeColor = '#000000',
+        array $icons = []
+    ) {
+        $this->name = $name;
+        $this->shortName = $shortName;
+        $this->description = $description;
+        $this->startUrl = $startUrl;
+        $this->display = $display;
+        $this->backgroundColor = $backgroundColor;
+        $this->themeColor = $themeColor;
+        $this->icons = $icons;
+    }
+
+    /**
      * Process an incoming server request and return a response.
      *
      * @param ServerRequestInterface $request  The request
@@ -30,15 +102,10 @@ class ManifestJsonMiddleware implements MiddlewareInterface
 
         // Handle manifest.json requests
         if ($uri === '/manifest.json' || $uri === '/manifest.webmanifest') {
-            $manifest = [
-                'name' => 'Oryx PWA App',
-                'short_name' => 'OryxApp',
-                'description' => 'A PWA built with Oryx ADR',
-                'start_url' => '/',
-                'display' => 'standalone',
-                'background_color' => '#ffffff',
-                'theme_color' => '#000000',
-                'icons' => [
+            // Use provided icons or fall back to defaults
+            $icons = $this->icons;
+            if (empty($icons)) {
+                $icons = [
                     [
                         'src' => '/icons/icon-72x72.png',
                         'sizes' => '72x72',
@@ -79,7 +146,18 @@ class ManifestJsonMiddleware implements MiddlewareInterface
                         'sizes' => '512x512',
                         'type' => 'image/png'
                     ]
-                ]
+                ];
+            }
+
+            $manifest = [
+                'name' => $this->name,
+                'short_name' => $this->shortName,
+                'description' => $this->description,
+                'start_url' => $this->startUrl,
+                'display' => $this->display,
+                'background_color' => $this->backgroundColor,
+                'theme_color' => $this->themeColor,
+                'icons' => $icons
             ];
 
             return new JsonResponse($manifest, 200, [

@@ -168,15 +168,39 @@ The ManifestJsonMiddleware automatically handles requests for:
 - `/manifest.json`
 - `/manifest.webmanifest`
 
-It returns a standard PWA manifest with:
-- App name and short name
-- Description
-- Start URL
-- Display mode
-- Theme and background colors
-- Icon array for various sizes
+It returns a standard PWA manifest with configurable properties:
+- App name and short name (configurable via constructor)
+- Description (configurable via constructor)
+- Start URL (configurable via constructor)
+- Display mode (configurable via constructor)
+- Theme and background colors (configurable via constructor)
+- Icon array for various sizes (configurable via constructor, falls back to default set if empty)
 
 The middleware delegates all other requests to the next middleware in the queue.
+
+#### Usage with Custom Values
+
+```php
+use Oryx\Adr\Middleware\ManifestJsonMiddleware;
+
+// Create middleware with custom PWA manifest values
+$middleware = new ManifestJsonMiddleware(
+    'My Custom PWA',           // name
+    'MyApp',                   // short_name
+    'A custom PWA application',// description
+    '/home',                   // start_url
+    'fullscreen',              // display
+    '#000000',                 // background_color
+    '#ffffff',                 // theme_color
+    [                          // icons (empty array uses default icons)
+        [
+            'src' => '/icons/custom-192.png',
+            'sizes' => '192x192',
+            'type' => 'image/png'
+        ]
+    ]
+);
+```
 
 ## PWA Compatibility
 
